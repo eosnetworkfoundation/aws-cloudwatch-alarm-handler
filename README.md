@@ -9,6 +9,7 @@ JavaScript Amazon Web Services (AWS) [Lambda](https://aws.amazon.com/lambda) fun
     1. [Prerequisites](#prerequisites)
     1. [Initialization](#initialization)
     1. [Lint](#lint)
+    1. [Test](#test)
 
 ## Development
 Start here to build this project or to contribute to this repo.
@@ -49,6 +50,13 @@ This project uses [eslint](https://eslint.org) with customizations on top of the
 yarn lint
 ```
 The purpose of linting is to catch bugs early, not to create unnecessary friction, so many rules which will not realistically catch bugs are disabled.
+
+### Test
+This project uses the [jest](https://jestjs.io) test framework.
+```bash
+yarn test
+```
+The goal is full test coverage, not because we chased a number, but because we exhaustively tested all intended functionality.
 
 ---
 > **_Legal Notice_**  

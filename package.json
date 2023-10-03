@@ -1,0 +1,24 @@
+{
+  "name": "aws-cloudwatch-alarm-handler",
+  "version": "0.0.1",
+  "description": "JavaScript AWS Lambda function to take a CloudWatch alarm state change event, generate a human-readable notification body, and send it to an SNS topic.",
+  "main": "index.js",
+  "repository": "git@github.com:eosnetworkfoundation/aws-cloudwatch-alarm-handler.git",
+  "homepage": "https://github.com/eosnetworkfoundation/aws-cloudwatch-alarm-handler",
+  "author": {
+    "name": "EOS Network Foundation Automation",
+    "email": "zach.butler+aws-cloudwatch-alarm-handler@eosnetwork.com",
+    "url": "https://eosnetwork.com"
+  },
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+  },
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}

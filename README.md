@@ -1,2 +1,2 @@
 # AWS CloudWatch Alarm Handler
-JavaScript AWS Lambda function to take a CloudWatch alarm state change event, generate a human-readable notification body, and send it to an SNS topic.
+JavaScript Amazon Web Services (AWS) [Lambda](https://aws.amazon.com/lambda) function to take a [CloudWatch](https://aws.amazon.com/cloudwatch) alarm state change event, generate a human-readable notification body, and send it to an [SNS](https://docs.aws.amazon.com/sns/latest/dg/welcome.html) topic.

@@ -25,5 +25,25 @@
     "eslint": "^8.50.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.28.1"
+  },
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "rules": {
+      "arrow-parens": "off",
+      "comma-dangle": "warn",
+      "default-param-last": "off",
+      "import/extensions": "off",
+      "import/order": "off",
+      "indent": [
+        "error",
+        4
+      ],
+      "max-len": "off",
+      "no-console": "off",
+      "no-plusplus": "off",
+      "no-underscore-dangle": "off",
+      "no-use-before-define": "warn",
+      "object-curly-spacing": "off"
+    }
   }
 }

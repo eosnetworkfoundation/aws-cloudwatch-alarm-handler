@@ -11,6 +11,7 @@ JavaScript Amazon Web Services (AWS) [Lambda](https://aws.amazon.com/lambda) fun
     1. [Lint](#lint)
     1. [Test](#test)
     1. [Build](#build)
+1. [CI](#ci)
 
 ## Development
 Start here to build this project or to contribute to this repo.
@@ -67,6 +68,14 @@ yarn build
 The "build" generates a `*.zip` archive in the root of the repo that can be uploaded directly to AWS Lambda using the web console, AWS CLI, or with something like ~~Terraform~~ Tofu.
 
 The output of `yarn pack` is **_not_** compatible with AWS. AWS requires the dependencies (`node_modules`) to be packed in the `*.zip` file for lambdas, so it may be wise to do your own build with updated dependencies to make sure your deployment is not missing any security patches published for dependencies since our latest release. If you are building a tag, the script requires the version in the `git` tag to match the version in the `package.json`. Finally, the build script does briefly move your `node_modules` folder in order to guarantee developer dependencies are not packed into the `*.zip` file so it is as small as possible. The script puts your `node_modules` back afterwards so this should hopefully not be a problem for anyone.
+
+## CI
+This repo contains the following GitHub Actions workflow for continuous integration (CI):
+- **AWS CloudWatch Alarm Handler CI** - lint, test, and build the `aws-cloudwatch-alarm-handler` project.
+    - [Pipeline](https://github.com/eosnetworkfoundation/aws-cloudwatch-alarm-handler/actions/workflows/ci.yml)
+    - [Documentation](./.github/workflows/ci.md)
+
+See the pipeline documentation for more information.
 
 ---
 > **_Legal Notice_**  

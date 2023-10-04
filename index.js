@@ -3,7 +3,7 @@ const is = require('./is.js');
 const joi = require('joi');
 const moment = require('moment-timezone');
 const pkg = require('./package.json');
-const { SnsClient } = require('@aws-sdk/client-sns');
+const { SnsClient, SnsPublishCommand } = require('@aws-sdk/client-sns');
 
 /* joi schema */
 // schema of a CloudWatch alarm state
@@ -179,6 +179,19 @@ Object.defineProperty(this, 'version', {
     get: () => ((is.nullOrEmpty(pkg.git.tag)) ? pkg.git.commit : pkg.git.tag),
 });
 
+/* sns */
+// publish an SNS message
+const pushSnsMsg = async (message, topicArn = this.topicArn) => {
+    console.log('Sending message to SNS...');
+    const command = new SnsPublishCommand({
+        Message: message,
+        TopicArn: topicArn,
+    });
+    const response = await this.sns.send(command);
+    console.log('SNS message sent.');
+    return response;
+};
+
 /* telegram */
 // take a string and replace HTML characters with escape sequences as required for Telegram
 const enc = (str) => {
@@ -292,7 +305,7 @@ module.exports.handler = async (event) => {
     // generate human-readable notification
     const notification = this.formatCloudwatchEvent(message);
     // send message to SNS topic
-    const response = await pushTelegramMsg(notification);
+    const response = await pushSnsMsg(notification);
     // construct useful data to return
     const rawResult = {
         input: event,

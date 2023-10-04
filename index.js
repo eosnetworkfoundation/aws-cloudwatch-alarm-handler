@@ -56,20 +56,6 @@ const accessEnv = (key, secret = true) => {
     return value;
 };
 
-// determine if an SNS event came from an SNS topic used for testing
-const isDevSnsTopic = (event) => {
-    const testArn = accessEnv('DEV_EVENT_SOURCE_ARN');
-    return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
-};
-
-// parse alarm state reasonData
-const parseReasonData = (message) => {
-    const output = message;
-    output.detail.previousState.reasonData = JSON.parse(message.detail.previousState.reasonData);
-    output.detail.state.reasonData = JSON.parse(message.detail.state.reasonData);
-    return output;
-};
-
 // extract SNS message contents from an SNS event
 const parseSnsMessage = (event) => {
     console.log('Parsing SNS message...');
@@ -98,9 +84,7 @@ const parseSnsMessage = (event) => {
 const sanitize = (str) => str
     /* eslint-disable no-template-curly-in-string */
     .replace(new RegExp(process.env.TELEGRAM_API_KEY, 'g'), '${TELEGRAM_API_KEY}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID, 'g'), '${TELEGRAM_CHAT_ID}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_DEV, 'g'), '${TELEGRAM_CHAT_ID_DEV}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_OWNER, 'g'), '${TELEGRAM_CHAT_ID_OWNER}');
+    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID, 'g'), '${TELEGRAM_CHAT_ID}');
     /* eslint-enable no-template-curly-in-string */
 
 /* globals */
@@ -122,28 +106,9 @@ Object.defineProperty(this, 'api', {
     },
 });
 
-// telegram chat ID for customer notifications
-let _chatIdCustomer;
-Object.defineProperty(this, 'chatIdCustomer', {
-    get: () => {
-        if (is.nullOrEmpty(_chatIdCustomer)) {
-            _chatIdCustomer = accessEnv('TELEGRAM_CHAT_ID', false);
-            if (is.nullOrEmpty(_chatIdCustomer)) {
-                throw new Error('TELEGRAM_CHAT_ID is not defined in the environment!');
-            }
-        }
-        return _chatIdCustomer;
-    },
-});
-
-// telegram chat ID for test notifications
-Object.defineProperty(this, 'chatIdDev', {
-    get: () => accessEnv('TELEGRAM_CHAT_ID_DEV', false),
-});
-
 // telegram chat ID for alerts to the bot owner/maintainer
-Object.defineProperty(this, 'chatIdOwner', {
-    get: () => accessEnv('TELEGRAM_CHAT_ID_OWNER', false),
+Object.defineProperty(this, 'chatId', {
+    get: () => accessEnv('TELEGRAM_CHAT_ID', false),
 });
 
 // name or contact info for the bot maintainer
@@ -232,7 +197,7 @@ const pushTelegramMsgErr = (err) => {
         const tail = `Please contact ${enc(this.maintainer)} if you see this message.`;
         // join message parts
         const msg = `${head}\n${intro}\n\n${stack}\n\n${logs}\n\n${tail}`;
-        return pushTelegramMsg(msg, this.chatIdOwner || this.chatId);
+        return pushTelegramMsg(msg, this.chatId);
     } catch (error) {
         console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on
         return Promise.resolve();
@@ -291,15 +256,16 @@ module.exports.formatCloudwatchEvent = (message) => {
 
 // handle SNS event
 module.exports.handler = async (event) => {
-    console.log('Received event:', JSON.stringify(event, null, 4));
     // validate event schema
+    console.log('Received event:', JSON.stringify(event, null, 4));
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
     // parse and validate message contents
-    let message = parseSnsMessage(event);
+    const message = parseSnsMessage(event);
     joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
-    message = parseReasonData(message);
-    // send message to Telegram
-    const response = await pushTelegramMsg(this.formatCloudwatchEvent(message), isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
+    // generate human-readable notification
+    const notification = this.formatCloudwatchEvent(message);
+    // send message to SNS topic
+    const response = await pushTelegramMsg(notification);
     // construct useful data to return
     const rawResult = {
         input: event,

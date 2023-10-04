@@ -109,7 +109,13 @@ Object.defineProperty(this, 'api', {
 
 // telegram chat ID for alerts to the bot owner/maintainer
 Object.defineProperty(this, 'chatId', {
-    get: () => accessEnv('TELEGRAM_CHAT_ID', false),
+    get: () => {
+        const chatId = accessEnv('TELEGRAM_CHAT_ID');
+        if (is.nullOrEmpty(chatId)) {
+            throw new Error('TELEGRAM_CHAT_ID is not defined in the environment!');
+        }
+        return chatId;
+    },
 });
 
 // name or contact info for the bot maintainer

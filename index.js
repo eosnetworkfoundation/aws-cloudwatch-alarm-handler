@@ -3,7 +3,7 @@ const is = require('./is.js');
 const joi = require('joi');
 const moment = require('moment-timezone');
 const pkg = require('./package.json');
-const { SnsClient, SnsPublishCommand } = require('@aws-sdk/client-sns');
+const { SnsClient, PublishCommand } = require('@aws-sdk/client-sns');
 
 /* joi schema */
 // schema of a CloudWatch alarm state
@@ -189,7 +189,7 @@ Object.defineProperty(this, 'version', {
 // publish an SNS message
 const pushSnsMsg = async (message, subject, topicArn = this.topicArn) => {
     console.log('Sending message to SNS...');
-    const command = new SnsPublishCommand({
+    const command = new PublishCommand({
         Message: message,
         Subject: subject,
         TopicArn: topicArn,

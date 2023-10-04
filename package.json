@@ -13,6 +13,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "reset": "scripts/reset.sh"
   },
   "files": [
     "index.js"

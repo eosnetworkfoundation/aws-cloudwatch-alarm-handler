@@ -133,13 +133,14 @@ Object.defineProperty(this, 'name', {
 });
 
 // return a configured SNS client
+let _sns;
 Object.defineProperty(this, 'sns', {
     get: () => {
-        let region = accessEnv('AWS_SNS_REGION');
-        if (is.nullOrEmpty(region)) {
-            region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
+        if (is.nullOrEmpty(_sns)) {
+            const region = this.topicArn.split(':')[3];
+            _sns = new SnsClient({ region });
         }
-        return new SnsClient({ region });
+        return _sns;
     },
 });
 

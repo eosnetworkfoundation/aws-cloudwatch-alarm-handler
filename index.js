@@ -3,7 +3,7 @@ const is = require('./is.js');
 const joi = require('joi');
 const moment = require('moment-timezone');
 const pkg = require('./package.json');
-const { SnsClient, PublishCommand } = require('@aws-sdk/client-sns');
+const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
 
 /* joi schema */
 // schema of a CloudWatch alarm state
@@ -144,7 +144,7 @@ Object.defineProperty(this, 'sns', {
     get: () => {
         if (is.nullOrEmpty(_sns)) {
             const region = this.topicArn.split(':')[3];
-            _sns = new SnsClient({ region });
+            _sns = new SNSClient({ region });
         }
         return _sns;
     },

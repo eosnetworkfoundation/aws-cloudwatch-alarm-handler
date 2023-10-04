@@ -15,6 +15,7 @@ JavaScript Amazon Web Services (AWS) [Lambda](https://aws.amazon.com/lambda) fun
 1. [Inputs](#inputs)
     1. [Environment Variables](#environment-variables)
     1. [Events](#events)
+1. [Outputs](#outputs)
 
 ## Development
 Start here to build this project or to contribute to this repo.
@@ -196,6 +197,25 @@ The `reasonData` field looks like this when parsed and expanded.
 }
 ```
 The `reasonData` field is not being parsed or validated because we currently do not use it. Code to unpack the `reasonData` field is [here](https://github.com/eosnetworkfoundation/aws-cloudwatch-alarm-handler/blob/3097e31d525d852bfffcf098a7750455bd28c176/index.js#L65) if you ever need it.
+
+## Outputs
+This lambda has four primary outputs:
+1. An SNS message published to an SNS topic containing:
+    - **message** - a string containing a human-readable alarm notification.
+    - **subject** - a string for the email subject, if you have email subscribers.
+1. Telegram messages about runtime errors intended for the maintainer.
+1. Logs in CloudWatch.
+1. Return value, a JSON object with this schema:
+    - **body**:
+        - **input** - original event received by the lambda.
+        - **message** - parsed SNS message.
+        - **output**:
+            - **data** - data from the Telegram API response.
+            - **error** - any error encountered during the Telegram request.
+            - **status** - HTTP status of the Telegram response.
+    - **statusCode** - HTTP response for the lambda as a whole.
+
+The lambda makes a good-faith attempt to sanitize secrets from Telegram message contents and log output, but it is ultimately the responsibility of the maintainer to ensure secrets are not leaked.
 
 ---
 > **_Legal Notice_**  

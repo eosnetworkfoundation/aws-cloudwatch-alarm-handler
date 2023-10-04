@@ -19,7 +19,8 @@
     "test": "jest --coverage"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "is.js"
   ],
   "dependencies": {
     "@aws-sdk/client-sns": "^3.423.0",

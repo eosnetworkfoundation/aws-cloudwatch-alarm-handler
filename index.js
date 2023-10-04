@@ -159,6 +159,20 @@ Object.defineProperty(this, 'timezone', {
     },
 });
 
+// return SNS topic ARN
+let _topicArn;
+Object.defineProperty(this, 'topicArn', {
+    get: () => {
+        if (is.nullOrEmpty(_topicArn)) {
+            _topicArn = accessEnv('AWS_SNS_TOPIC_ARN');
+            if (is.nullOrEmpty(_topicArn)) {
+                throw new Error('AWS_SNS_TOPIC_ARN is not defined in the environment!');
+            }
+        }
+        return _topicArn;
+    },
+});
+
 // return the git version of this build
 Object.defineProperty(this, 'version', {
     get: () => ((is.nullOrEmpty(pkg.git.tag)) ? pkg.git.commit : pkg.git.tag),

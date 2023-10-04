@@ -181,10 +181,11 @@ Object.defineProperty(this, 'version', {
 
 /* sns */
 // publish an SNS message
-const pushSnsMsg = async (message, topicArn = this.topicArn) => {
+const pushSnsMsg = async (message, subject, topicArn = this.topicArn) => {
     console.log('Sending message to SNS...');
     const command = new SnsPublishCommand({
         Message: message,
+        Subject: subject,
         TopicArn: topicArn,
     });
     const response = await this.sns.send(command);
@@ -304,8 +305,9 @@ module.exports.handler = async (event) => {
     joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
     // generate human-readable notification
     const notification = this.formatCloudwatchEvent(message);
+    const subject = `${this.maintainer} - ${message.detail.alarmName} ${message.detail.state.value}`;
     // send message to SNS topic
-    const response = await pushSnsMsg(notification);
+    const response = await pushSnsMsg(notification, subject);
     // construct useful data to return
     const rawResult = {
         input: event,

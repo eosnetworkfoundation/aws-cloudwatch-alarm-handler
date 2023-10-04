@@ -98,7 +98,7 @@ Key | Usage | Type | Description
 `AWS_LAMBDA_LOG_STREAM_NAME` | [Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | String | Used to link maintainer to CloudWatch logs on error.
 `AWS_REGION` | [Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | String | Used to link maintainer to CloudWatch logs on error.
 `AWS_SNS_TOPIC_ARN` | Required | String | Destination SNS topic ARN.
-`MAINTAINER` | Optional | String | Name of the bot maintainer or team.
+`MAINTAINER` | Required | String | Name of the bot maintainer or team.
 `TELEGRAM_API_KEY` | Required | String | The API key for the Telegram bot.
 `TELEGRAM_CHAT_ID` | Required | String | Telegram chat ID for runtime error notifications.
 `TIMEZONE` | Optional | JSON string array | List of timezone names and/or abbreviations accepted by [moment-timezone](https://momentjs.com/timezone/docs) in which to print event timestamps.

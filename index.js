@@ -249,13 +249,13 @@ const pushTelegramMsgErr = (err) => {
 };
 
 /* entrypoint */
-module.exports.entrypoint = async (event) => {
+module.exports.handler = async (event) => {
     const result = {
         statusCode: 500,
         body: 'FATAL: Unknown error!',
     };
     try {
-        result.body = await this.handler(event);
+        result.body = await this.main(event);
         result.statusCode = 200;
     } catch (error) {
         result.body = error;
@@ -299,7 +299,7 @@ module.exports.formatCloudwatchEvent = (message) => {
 };
 
 // handle SNS event
-module.exports.handler = async (event) => {
+module.exports.main = async (event) => {
     // validate event schema
     console.log('Received event:', JSON.stringify(event, null, 4));
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');

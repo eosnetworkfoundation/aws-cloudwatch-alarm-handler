@@ -1,4 +1,3 @@
-const axios = require('axios');
 const is = require('./is.js');
 const joi = require('joi');
 const moment = require('moment-timezone');
@@ -74,43 +73,7 @@ const parseSnsMessage = (event) => {
     return message;
 };
 
-// scrub sensitive data from a string
-const sanitize = (str) => str
-    /* eslint-disable no-template-curly-in-string */
-    .replace(new RegExp(process.env.TELEGRAM_API_KEY, 'g'), '${TELEGRAM_API_KEY}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID, 'g'), '${TELEGRAM_CHAT_ID}');
-    /* eslint-enable no-template-curly-in-string */
-
 /* globals */
-// telegram API integration
-let _api;
-let _apiKey;
-Object.defineProperty(this, 'api', {
-    get: () => {
-        if (is.nullOrEmpty(_api)) {
-            _apiKey = accessEnv('TELEGRAM_API_KEY', true);
-            if (is.nullOrEmpty(_apiKey)) {
-                throw new Error('TELEGRAM_API_KEY is not defined in the environment!');
-            }
-            _api = axios.create({
-                baseURL: `https://api.telegram.org/bot${_apiKey}/sendMessage`,
-            });
-        }
-        return _api;
-    },
-});
-
-// telegram chat ID for alerts to the bot owner/maintainer
-Object.defineProperty(this, 'chatId', {
-    get: () => {
-        const chatId = accessEnv('TELEGRAM_CHAT_ID');
-        if (is.nullOrEmpty(chatId)) {
-            throw new Error('TELEGRAM_CHAT_ID is not defined in the environment!');
-        }
-        return chatId;
-    },
-});
-
 // name or contact info for the bot maintainer
 Object.defineProperty(this, 'maintainer', {
     get: () => accessEnv('MAINTAINER'),
@@ -192,48 +155,6 @@ const pushSnsMsg = async (message, subject, topicArn = this.topicArn) => {
     return response;
 };
 
-/* telegram */
-// take a string and replace HTML characters with escape sequences as required for Telegram
-const enc = (str) => {
-    const replacements = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-    };
-    return str.replace(/[&<>]/g, char => replacements[char]);
-};
-
-// send a Telegram message
-const pushTelegramMsg = async (message, chatId = this.chatId) => {
-    console.log('Sending message to Telegram...');
-    const response = await this.api.get('', {
-        params: {
-            chat_id: chatId,
-            disable_web_page_preview: true,
-            parse_mode: 'HTML',
-            text: sanitize(message),
-        },
-    });
-    if (response.status >= 300) {
-        const msg = `Telegram returned an unexpected ${response.status} HTTP status code.`;
-        console.error(`ERROR: ${msg}`, sanitize(response.data.toString()));
-        throw new Error(msg);
-    }
-    console.log('Telegram message sent.');
-    return response;
-};
-
-// send an error message to Telegram
-const pushTelegramMsgErr = (err) => {
-    try {
-        const msg = this.notificationFromError(err);
-        return pushTelegramMsg(msg, this.chatId);
-    } catch (error) {
-        console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on
-        return Promise.resolve();
-    }
-};
-
 /* entrypoint */
 module.exports.handler = async (event) => {
     const result = {
@@ -245,8 +166,7 @@ module.exports.handler = async (event) => {
         result.statusCode = 200;
     } catch (error) {
         result.body = error;
-        console.error(sanitize(`FATAL: ${error.message}`), sanitize(error.toString()));
-        await pushTelegramMsgErr(error);
+        console.error(`FATAL: ${error.message}`, error.toString());
     }
     return result;
 };
@@ -263,9 +183,8 @@ module.exports.main = async (event) => {
     const notification = this.notificationFromCloudWatchEvent(message);
     const subject = `${this.maintainer} - ${message.detail.alarmName} ${message.detail.state.value}`;
     // send message to SNS topic
-    const response = await pushSnsMsg(notification, subject);
+    const result = await pushSnsMsg(notification, subject);
     // sanitize, print, and return result
-    const result = JSON.parse(sanitize(JSON.stringify(response, null, 4)));
     console.log('Done.', result);
     return result;
 };

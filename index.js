@@ -46,12 +46,12 @@ const snsEventSchema = joi.object({
 
 /* functions */
 // read an environment variable and log the status
-const accessEnv = (key, secret = true) => {
+const accessEnv = (key) => {
     const value = process.env[key];
     if (is.nullOrEmpty(value)) {
         console.warn(`WARNING: ${key} is not defined in the environment!`);
     } else {
-        console.log(`Read ${value.length} char ${key}${secret ? '' : ` ("${value.slice(0, 2)}...${value.slice(-4)}")`} from the environment.`);
+        console.log(`Read "${key}" from the environment as "${value}".`);
     }
     return value;
 };

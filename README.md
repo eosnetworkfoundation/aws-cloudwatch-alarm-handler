@@ -98,7 +98,8 @@ Key | Usage | Type | Description
 `AWS_LAMBDA_LOG_GROUP_NAME` | [Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | String | Used to link maintainer to CloudWatch logs on error.
 `AWS_LAMBDA_LOG_STREAM_NAME` | [Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | String | Used to link maintainer to CloudWatch logs on error.
 `AWS_REGION` | [Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | String | Used to link maintainer to CloudWatch logs on error.
-`AWS_SNS_TOPIC_ARN` | Required | String | Destination SNS topic ARN.
+`AWS_SNS_TOPIC_ARN` | Required | String | SNS topic ARN for delivery of CloudWatch alarm notifications.
+`AWS_SNS_TOPIC_ARN_ERROR` | Required | String | SNS topic ARN for delivery of runtime errors.
 `MAINTAINER` | Required | String | Name of the bot maintainer or team.
 `TIMEZONE` | Optional | JSON string array | List of timezone names and/or abbreviations accepted by [moment-timezone](https://momentjs.com/timezone/docs) in which to print event timestamps.
 

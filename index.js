@@ -61,6 +61,22 @@ Object.defineProperty(this, 'alarmTopicArn', {
     },
 });
 
+// return SNS topic ARN for runtime error notifications
+let _errorTopicArn;
+Object.defineProperty(this, 'errorTopicArn', {
+    get: () => {
+        if (is.nullOrEmpty(_errorTopicArn)) {
+            _errorTopicArn = process.env.AWS_SNS_TOPIC_ARN_ERROR;
+            if (is.nullOrEmpty(_errorTopicArn)) {
+                throw new Error('AWS_SNS_TOPIC_ARN_ERROR is not defined in the environment!');
+            } else {
+                console.log(`Read "AWS_SNS_TOPIC_ARN_ERROR" from the environment as "${_errorTopicArn}".`);
+            }
+        }
+        return _errorTopicArn;
+    },
+});
+
 // return the log URI
 Object.defineProperty(this, 'logUri', {
     get: () => {
@@ -140,6 +156,13 @@ module.exports.handler = async (event) => {
     } catch (error) {
         result.body = error;
         console.error(`FATAL: ${error.message}`, error.toString());
+        try {
+            const notification = this.notificationFromError(error);
+            const subject = `${this.maintainer} - ${process.env.AWS_LAMBDA_FUNCTION_NAME} Runtime Error`;
+            await this.pushSnsMsg(notification, subject, this.errorTopicArn);
+        } catch (err) {
+            console.error(`ERROR: ${err.message}`, err.toString());
+        }
     }
     return result;
 };

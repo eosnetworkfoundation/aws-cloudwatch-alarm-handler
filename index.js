@@ -258,8 +258,27 @@ module.exports.handler = async (event) => {
     return result;
 };
 
-// format SNS message for humans
-module.exports.formatCloudwatchEvent = (message) => {
+// handle SNS event
+module.exports.main = async (event) => {
+    // validate event schema
+    console.log('Received event:', JSON.stringify(event, null, 4));
+    joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
+    // parse and validate message contents
+    const message = parseSnsMessage(event);
+    joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
+    // generate human-readable notification
+    const notification = this.notificationFromCloudWatchEvent(message);
+    const subject = `${this.maintainer} - ${message.detail.alarmName} ${message.detail.state.value}`;
+    // send message to SNS topic
+    const response = await pushSnsMsg(notification, subject);
+    // sanitize, print, and return result
+    const result = JSON.parse(sanitize(JSON.stringify(response, null, 4)));
+    console.log('Done.', result);
+    return result;
+};
+
+// return a human-friendly notification body for a CloudWatch alarm state change event
+module.exports.notificationFromCloudWatchEvent = (message) => {
     let emoji;
     let state;
     let tail;
@@ -289,23 +308,4 @@ module.exports.formatCloudwatchEvent = (message) => {
     timestamp += '```';
     // construct and return message
     return `${head}\n${intro} ${description}\n\n${reason}\n${timestamp}\n${tail}`;
-};
-
-// handle SNS event
-module.exports.main = async (event) => {
-    // validate event schema
-    console.log('Received event:', JSON.stringify(event, null, 4));
-    joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
-    // parse and validate message contents
-    const message = parseSnsMessage(event);
-    joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
-    // generate human-readable notification
-    const notification = this.formatCloudwatchEvent(message);
-    const subject = `${this.maintainer} - ${message.detail.alarmName} ${message.detail.state.value}`;
-    // send message to SNS topic
-    const response = await pushSnsMsg(notification, subject);
-    // sanitize, print, and return result
-    const result = JSON.parse(sanitize(JSON.stringify(response, null, 4)));
-    console.log('Done.', result);
-    return result;
 };

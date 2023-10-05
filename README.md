@@ -203,16 +203,8 @@ This lambda has four primary outputs:
     - **subject** - a string for the email subject, if you have email subscribers.
 1. Logs in CloudWatch.
 1. Return value, a JSON object with this schema:
-    - **body**:
-        - **input** - original event received by the lambda.
-        - **message** - parsed SNS message.
-        - **output**:
-            - **data** - data from the Telegram API response.
-            - **error** - any error encountered during the Telegram request.
-            - **status** - HTTP status of the Telegram response.
+    - **body** - response from SNS publish command.
     - **statusCode** - HTTP response for the lambda as a whole.
-
-The lambda makes a good-faith attempt to sanitize secrets from Telegram message contents and log output, but it is ultimately the responsibility of the maintainer to ensure secrets are not leaked.
 
 ---
 > **_Legal Notice_**  

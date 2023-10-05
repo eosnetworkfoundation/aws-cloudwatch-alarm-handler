@@ -44,18 +44,6 @@ const snsEventSchema = joi.object({
     Records: joi.array().items(snsEventRecordSchema).min(1).required(),
 }).unknown();
 
-/* functions */
-// read an environment variable and log the status
-const accessEnv = (key) => {
-    const value = process.env[key];
-    if (is.nullOrEmpty(value)) {
-        console.warn(`WARNING: ${key} is not defined in the environment!`);
-    } else {
-        console.log(`Read "${key}" from the environment as "${value}".`);
-    }
-    return value;
-};
-
 /* globals */
 // return the log URI
 Object.defineProperty(this, 'logUri', {
@@ -72,9 +60,12 @@ let _maintainer;
 Object.defineProperty(this, 'maintainer', {
     get: () => {
         if (is.nullOrEmpty(_maintainer)) {
-            _maintainer = accessEnv('MAINTAINER');
+            _maintainer = process.env.MAINTAINER;
             if (is.nullOrEmpty(_maintainer)) {
+                console.log('NOTICE: "MAINTAINER" is not defined in the environment!');
                 _maintainer = 'the bot maintainer';
+            } else {
+                console.log(`Read "MAINTAINER" from the environment as "${_maintainer}".`);
             }
         }
         return _maintainer;
@@ -103,8 +94,9 @@ let _tz;
 Object.defineProperty(this, 'timezone', {
     get: () => {
         if (is.nullOrEmpty(_tz)) {
-            const tz = accessEnv('TIMEZONE');
+            const tz = process.env.TZ;
             if (is.nullOrEmpty(tz) || tz === '[]') {
+                console.log('NOTICE: "TZ" is not defined in the environment! Using UTC.');
                 _tz = ['UTC'];
             } else {
                 _tz = JSON.parse(tz);
@@ -119,9 +111,11 @@ let _topicArn;
 Object.defineProperty(this, 'topicArn', {
     get: () => {
         if (is.nullOrEmpty(_topicArn)) {
-            _topicArn = accessEnv('AWS_SNS_TOPIC_ARN');
+            _topicArn = process.env.AWS_SNS_TOPIC_ARN;
             if (is.nullOrEmpty(_topicArn)) {
                 throw new Error('AWS_SNS_TOPIC_ARN is not defined in the environment!');
+            } else {
+                console.log(`Read "AWS_SNS_TOPIC_ARN" from the environment as "${_topicArn}".`);
             }
         }
         return _topicArn;

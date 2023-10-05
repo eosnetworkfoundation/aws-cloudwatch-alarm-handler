@@ -74,6 +74,16 @@ const parseSnsMessage = (event) => {
 };
 
 /* globals */
+// return the log URI
+Object.defineProperty(this, 'logUri', {
+    get: () => {
+        const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
+        const logGroupName = encodeURIComponent(process.env.AWS_LAMBDA_LOG_GROUP_NAME);
+        const logStreamName = encodeURIComponent(process.env.AWS_LAMBDA_LOG_STREAM_NAME);
+        return `https://console.aws.amazon.com/cloudwatch/home?region=${region}#logsV2:log-groups/log-group/${logGroupName}/log-events/${logStreamName}`;
+    },
+});
+
 // name or contact info for the bot maintainer
 let _maintainer;
 Object.defineProperty(this, 'maintainer', {
@@ -85,16 +95,6 @@ Object.defineProperty(this, 'maintainer', {
             }
         }
         return _maintainer;
-    },
-});
-
-// return the log URI
-Object.defineProperty(this, 'logUri', {
-    get: () => {
-        const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
-        const logGroupName = encodeURIComponent(process.env.AWS_LAMBDA_LOG_GROUP_NAME);
-        const logStreamName = encodeURIComponent(process.env.AWS_LAMBDA_LOG_STREAM_NAME);
-        return `https://console.aws.amazon.com/cloudwatch/home?region=${region}#logsV2:log-groups/log-group/${logGroupName}/log-events/${logStreamName}`;
     },
 });
 

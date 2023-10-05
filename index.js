@@ -150,20 +150,6 @@ Object.defineProperty(this, 'version', {
     get: () => ((is.nullOrEmpty(pkg.git.tag)) ? pkg.git.commit : pkg.git.tag),
 });
 
-/* sns */
-// publish an SNS message
-const pushSnsMsg = async (message, subject, topicArn = this.topicArn) => {
-    console.log('Sending message to SNS...');
-    const command = new PublishCommand({
-        Message: message,
-        Subject: subject,
-        TopicArn: topicArn,
-    });
-    const response = await this.sns.send(command);
-    console.log('SNS message sent.');
-    return response;
-};
-
 /* entrypoint */
 module.exports.handler = async (event) => {
     const result = {
@@ -192,7 +178,7 @@ module.exports.main = async (event) => {
     const notification = this.notificationFromCloudWatchEvent(message);
     const subject = `${this.maintainer} - ${message.detail.alarmName} ${message.detail.state.value}`;
     // send message to SNS topic
-    const result = await pushSnsMsg(notification, subject);
+    const result = await this.pushSnsMsg(notification, subject);
     // sanitize, print, and return result
     console.log('Done.', result);
     return result;
@@ -241,4 +227,17 @@ module.exports.notificationFromError = (error) => {
     const tail = `Please contact ${this.maintainer} if you see this message.`;
     // join message parts
     return `${head}\n${intro}\n\n${stack}\n\n${logs}\n\n${tail}`;
+};
+
+// publish an SNS message
+module.exports.pushSnsMsg = async (message, subject, topicArn = this.topicArn) => {
+    console.log('Sending message to SNS...');
+    const command = new PublishCommand({
+        Message: message,
+        Subject: subject,
+        TopicArn: topicArn,
+    });
+    const response = await this.sns.send(command);
+    console.log('SNS message sent.');
+    return response;
 };

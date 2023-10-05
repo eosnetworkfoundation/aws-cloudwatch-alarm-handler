@@ -210,9 +210,6 @@ const enc = (str) => {
     return str.replace(/[&<>]/g, char => replacements[char]);
 };
 
-// replace pairs of back-ticks with HTML code tags
-const parseInlineCode = str => str.replace(/`([^`]+)`/g, '<code>$1</code>');
-
 // send a Telegram message
 const pushTelegramMsg = async (message, chatId = this.chatId) => {
     console.log('Sending message to Telegram...');
@@ -284,21 +281,21 @@ module.exports.formatCloudwatchEvent = (message) => {
     } else {
         emoji = '❔';
         state = 'ambiguous';
-        tail = `Contact ${enc(this.maintainer)} if this does not resolve in ten minutes or so.`;
+        tail = `Contact ${this.maintainer} if this does not resolve in ten minutes or so.`;
     }
-    const head = `${emoji} <b>${message.detail.alarmName}</b> ${emoji}`;
-    const intro = `The <code>${message.detail.alarmName}</code> alarm is ${state}!`;
-    const description = parseInlineCode(enc(message.detail.configuration.description));
-    const reason = enc(message.detail.state.reason.replace(/ [(][^)]*[0-9]{2}\/[0-9]{2}\/[0-9]{2}[^)]*[)]/, '')); // remove ambiguous timestamp(s) from reason string
+    const head = `${emoji} **${message.detail.alarmName}** ${emoji}`;
+    const intro = `The \`${message.detail.alarmName}\` alarm is ${state}!`;
+    const description = message.detail.configuration.description;
+    const reason = `Reason:\n\`\`\`\n${message.detail.state.reason.replace(/ [(][^)]*[0-9]{2}\/[0-9]{2}\/[0-9]{2}[^)]*[)]/, '')}\n\`\`\``; // remove ambiguous timestamp(s) from reason string
     // print timestamp in timezones of interest
     const time = moment(message.detail.state.timestamp);
-    let timestamp = 'Timestamp:\n<pre>';
+    let timestamp = 'Timestamp:\n```\n';
     for (let i = 0; i < this.timezone.length; i++) {
         timestamp += `${time.tz(this.timezone[i]).format('YYYY-MM-DD HH:mm:ss.SSS z')}\n`;
     }
-    timestamp += '</pre>';
+    timestamp += '```';
     // construct and return message
-    return `${head}\n${intro} ${description}\n\nReason:<pre>${reason}</pre>\n${timestamp}\n${tail}`;
+    return `${head}\n${intro} ${description}\n\n${reason}\n${timestamp}\n${tail}`;
 };
 
 // handle SNS event

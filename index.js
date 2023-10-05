@@ -56,23 +56,6 @@ const accessEnv = (key) => {
     return value;
 };
 
-// extract SNS message contents from an SNS event
-const parseSnsMessage = (event) => {
-    console.log('Parsing SNS message.');
-    let message;
-    let msgType;
-    const rawMessage = event.Records[0].Sns.Message;
-    try {
-        message = JSON.parse(rawMessage);
-        msgType = 'JSON';
-    } catch (error) {
-        message = rawMessage;
-        msgType = 'a string';
-    }
-    console.log(`Parsed SNS message as ${msgType}.`, message);
-    return message;
-};
-
 /* globals */
 // return the log URI
 Object.defineProperty(this, 'logUri', {
@@ -172,7 +155,7 @@ module.exports.main = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
     // parse and validate message contents
-    const message = parseSnsMessage(event);
+    const message = this.parseSnsMessage(event);
     joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
     // generate human-readable notification
     const notification = this.notificationFromCloudWatchEvent(message);
@@ -227,6 +210,23 @@ module.exports.notificationFromError = (error) => {
     const tail = `Please contact ${this.maintainer} if you see this message.`;
     // join message parts
     return `${head}\n${intro}\n\n${stack}\n\n${logs}\n\n${tail}`;
+};
+
+// extract SNS message contents from an SNS event
+module.exports.parseSnsMessage = (event) => {
+    console.log('Parsing SNS message.');
+    let message;
+    let msgType;
+    const rawMessage = event.Records[0].Sns.Message;
+    try {
+        message = JSON.parse(rawMessage);
+        msgType = 'JSON';
+    } catch (error) {
+        message = rawMessage;
+        msgType = 'a string';
+    }
+    console.log(`Parsed SNS message as ${msgType}.`, message);
+    return message;
 };
 
 // publish an SNS message

@@ -11,7 +11,7 @@ const cloudwatchAlarmStateSchema = joi.object({
     reason: joi.string().required(),
     reasonData: joi.string().required(),
     timestamp: joi.string().isoDate().required(),
-    value: joi.string().valid('ALARM', 'OK', 'INSUFFICIENT_DATA').required(),
+    value: joi.string().valid('ALARM', 'INSUFFICIENT_DATA', 'OK').required(),
 }).unknown();
 
 // schema of an unpacked CloudWatch alarm state change event

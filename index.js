@@ -59,25 +59,18 @@ const accessEnv = (key, secret = true) => {
 
 // extract SNS message contents from an SNS event
 const parseSnsMessage = (event) => {
-    console.log('Parsing SNS message...');
+    console.log('Parsing SNS message.');
     let message;
+    let msgType;
     const rawMessage = event.Records[0].Sns.Message;
-    if (is.nullOrEmpty(rawMessage)) {
-        console.log('SNS message is empty.');
+    try {
+        message = JSON.parse(rawMessage);
+        msgType = 'JSON';
+    } catch (error) {
         message = rawMessage;
-    } else if (is.string(rawMessage)) {
-        try {
-            message = JSON.parse(rawMessage);
-            console.log('SNS message parsed as JSON.');
-        } catch (error) {
-            console.log('SNS message is a non-empty string that does not parse as JSON.');
-            message = rawMessage;
-        }
-    } else {
-        console.log('SNS message is not empty or a string.');
-        message = rawMessage;
+        msgType = 'a string';
     }
-    console.log('Parsed SNS message.');
+    console.log(`Parsed SNS message as ${msgType}.`, message);
     return message;
 };
 

@@ -304,18 +304,8 @@ module.exports.main = async (event) => {
     const subject = `${this.maintainer} - ${message.detail.alarmName} ${message.detail.state.value}`;
     // send message to SNS topic
     const response = await pushSnsMsg(notification, subject);
-    // construct useful data to return
-    const rawResult = {
-        input: event,
-        message,
-        output: {
-            data: response.data || null,
-            error: response.error || null,
-            status: response.status || null,
-        },
-    };
     // sanitize, print, and return result
-    const result = sanitize(JSON.stringify(rawResult, null, 4));
+    const result = sanitize(JSON.stringify(response, null, 4));
     console.log('Done.', result);
     return result;
 };

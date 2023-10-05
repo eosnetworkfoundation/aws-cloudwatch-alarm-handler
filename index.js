@@ -305,7 +305,7 @@ module.exports.main = async (event) => {
     // send message to SNS topic
     const response = await pushSnsMsg(notification, subject);
     // sanitize, print, and return result
-    const result = sanitize(JSON.stringify(response, null, 4));
+    const result = JSON.parse(sanitize(JSON.stringify(response, null, 4)));
     console.log('Done.', result);
     return result;
 };

@@ -75,8 +75,17 @@ const parseSnsMessage = (event) => {
 
 /* globals */
 // name or contact info for the bot maintainer
+let _maintainer;
 Object.defineProperty(this, 'maintainer', {
-    get: () => accessEnv('MAINTAINER'),
+    get: () => {
+        if (is.nullOrEmpty(_maintainer)) {
+            _maintainer = accessEnv('MAINTAINER');
+            if (is.nullOrEmpty(_maintainer)) {
+                _maintainer = 'the bot maintainer';
+            }
+        }
+        return _maintainer;
+    },
 });
 
 // return the log URI

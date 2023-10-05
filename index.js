@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 const pkg = require('./package.json');
 const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
 
-/* joi schema */
+/* event schema */
 // schema of a CloudWatch alarm state
 const cloudwatchAlarmStateSchema = joi.object({
     reason: joi.string().required(),
@@ -127,7 +127,8 @@ Object.defineProperty(this, 'version', {
     get: () => ((is.nullOrEmpty(pkg.git.tag)) ? pkg.git.commit : pkg.git.tag),
 });
 
-/* entrypoint */
+/* functions */
+// lambda entrypoint; try to catch, log, and notify on error
 module.exports.handler = async (event) => {
     const result = {
         statusCode: 500,

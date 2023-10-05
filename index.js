@@ -45,6 +45,22 @@ const snsEventSchema = joi.object({
 }).unknown();
 
 /* globals */
+// return SNS topic ARN for customer-facing notifications
+let _alarmTopicArn;
+Object.defineProperty(this, 'alarmTopicArn', {
+    get: () => {
+        if (is.nullOrEmpty(_alarmTopicArn)) {
+            _alarmTopicArn = process.env.AWS_SNS_TOPIC_ARN;
+            if (is.nullOrEmpty(_alarmTopicArn)) {
+                throw new Error('AWS_SNS_TOPIC_ARN is not defined in the environment!');
+            } else {
+                console.log(`Read "AWS_SNS_TOPIC_ARN" from the environment as "${_alarmTopicArn}".`);
+            }
+        }
+        return _alarmTopicArn;
+    },
+});
+
 // return the log URI
 Object.defineProperty(this, 'logUri', {
     get: () => {
@@ -82,7 +98,7 @@ let _sns;
 Object.defineProperty(this, 'sns', {
     get: () => {
         if (is.nullOrEmpty(_sns)) {
-            const region = this.topicArn.split(':')[3];
+            const region = this.alarmTopicArn.split(':')[3];
             _sns = new SNSClient({ region });
         }
         return _sns;
@@ -103,22 +119,6 @@ Object.defineProperty(this, 'timezone', {
             }
         }
         return _tz;
-    },
-});
-
-// return SNS topic ARN
-let _topicArn;
-Object.defineProperty(this, 'topicArn', {
-    get: () => {
-        if (is.nullOrEmpty(_topicArn)) {
-            _topicArn = process.env.AWS_SNS_TOPIC_ARN;
-            if (is.nullOrEmpty(_topicArn)) {
-                throw new Error('AWS_SNS_TOPIC_ARN is not defined in the environment!');
-            } else {
-                console.log(`Read "AWS_SNS_TOPIC_ARN" from the environment as "${_topicArn}".`);
-            }
-        }
-        return _topicArn;
     },
 });
 
@@ -225,7 +225,7 @@ module.exports.parseSnsMessage = (event) => {
 };
 
 // publish an SNS message
-module.exports.pushSnsMsg = async (message, subject, topicArn = this.topicArn) => {
+module.exports.pushSnsMsg = async (message, subject, topicArn = this.alarmTopicArn) => {
     console.log('Sending message to SNS...');
     const command = new PublishCommand({
         Message: message,

@@ -166,7 +166,7 @@ module.exports.handler = async (event) => {
         result.body = await this.main(event);
         result.statusCode = 200;
     } catch (error) {
-        result.body = error;
+        result.body = error.toString();
         console.error(`FATAL: ${error.message}`, error.toString());
         try {
             const notification = this.notificationFromError(error);
@@ -191,8 +191,9 @@ module.exports.main = async (event) => {
     const notification = this.notificationFromCloudWatchEvent(message);
     const subject = `${this.maintainer} - ${message.detail.alarmName} ${message.detail.state.value}`;
     // send message to SNS topic
-    const result = await this.pushSnsMsg(notification, subject);
+    const response = await this.pushSnsMsg(notification, subject);
     // sanitize, print, and return result
+    const result = JSON.stringify(response, null, 4);
     console.log('Done.', result);
     return result;
 };

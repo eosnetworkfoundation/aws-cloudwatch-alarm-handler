@@ -61,6 +61,18 @@ Object.defineProperty(this, 'alarmTopicArn', {
     },
 });
 
+// return a call to action for customer-facing alarms
+Object.defineProperty(this, 'callToAction', {
+    get: () => {
+        const action = process.env.CALL_TO_ACTION_ALARM;
+        if (is.nullOrEmpty(action)) {
+            console.log('NOTICE: "CALL_TO_ACTION_ALARM" is not defined in the environment!');
+            return 'Please put eyes 👀 on this message if you are investigating this.';
+        }
+        return action;
+    },
+});
+
 // return SNS topic ARN for runtime error notifications
 let _errorTopicArn;
 Object.defineProperty(this, 'errorTopicArn', {
@@ -193,7 +205,7 @@ module.exports.notificationFromCloudWatchEvent = (message) => {
     if (message.detail.state.value === 'ALARM') {
         emoji = '❌';
         state = 'triggered';
-        tail = 'Please put eyes 👀 on this message if you are investigating this.';
+        tail = this.callToAction;
     } else if (message.detail.state.value === 'OK') {
         emoji = '✅';
         state = 'resolved';

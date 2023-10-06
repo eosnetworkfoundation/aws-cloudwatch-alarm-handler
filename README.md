@@ -100,6 +100,7 @@ Key | Usage | Type | Description
 `AWS_REGION` | [Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | String | Used to link maintainer to CloudWatch logs on error.
 `AWS_SNS_TOPIC_ARN` | Required | String | SNS topic ARN for delivery of CloudWatch alarm notifications.
 `AWS_SNS_TOPIC_ARN_ERROR` | Required | String | SNS topic ARN for delivery of runtime errors.
+`CALL_TO_ACTION_ALARM` | Optional | String | A "call to action" string printed at the end of alarm notifications.
 `MAINTAINER` | Required | String | Name of the bot maintainer or team.
 `TIMEZONE` | Optional | JSON string array | List of timezone names and/or abbreviations accepted by [moment-timezone](https://momentjs.com/timezone/docs) in which to print event timestamps.
 

@@ -138,9 +138,9 @@ let _tz;
 Object.defineProperty(this, 'timezone', {
     get: () => {
         if (is.nullOrEmpty(_tz)) {
-            const tz = process.env.TZ;
+            const tz = process.env.TIMEZONE;
             if (is.nullOrEmpty(tz) || tz.trim() === '[]') {
-                console.log('NOTICE: "TZ" is not defined in the environment! Using UTC.');
+                console.log('NOTICE: "TIMEZONE" is not defined in the environment! Using UTC.');
                 _tz = ['UTC'];
             } else {
                 _tz = JSON.parse(tz);

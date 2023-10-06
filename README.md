@@ -16,6 +16,7 @@ JavaScript Amazon Web Services (AWS) [Lambda](https://aws.amazon.com/lambda) fun
     1. [Environment Variables](#environment-variables)
     1. [Events](#events)
 1. [Outputs](#outputs)
+    1. [Examples](#examples)
 
 ## Development
 Start here to build this project or to contribute to this repo.
@@ -207,6 +208,66 @@ This lambda has four primary outputs:
 1. Return value, a JSON object with this schema:
     - **body** - response from SNS publish command.
     - **statusCode** - HTTP response for the lambda as a whole.
+
+### Examples
+Here are some sample notifications.
+
+#### ALARM
+Raw:
+```json
+"❌ **acmecorp-us-east_server-cpu-too-high** ❌\nThe `acmecorp-us-east_server-cpu-too-high` alarm is triggered! This alarm triggers when CPU utilization of the `acmecorp-us-east` server exceeds 50% for five minutes.\n\nReason:\n```\nThreshold Crossed: 1 out of the last 1 datapoints [99.50160229693434] was greater than the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).\n```\nTimestamp:\n```\n2019-02-10 16:59:00.412 EDT\n```\nPlease put eyes 👀 on this message if you are investigating this."
+```
+Rendered:
+> ❌ **acmecorp-us-east_server-cpu-too-high** ❌
+> The `acmecorp-us-east_server-cpu-too-high` alarm is triggered! This alarm triggers when CPU utilization of the `acmecorp-us-east` server exceeds 50% for five minutes.
+>
+> Reason:
+> ```
+> Threshold Crossed: 1 out of the last 1 datapoints [99.50160229693434] was greater than the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).
+> ```
+> Timestamp:
+> ```
+> 2019-02-10 16:59:00.412 EDT
+> ```
+> Please put eyes 👀 on this message if you are investigating this.
+
+#### INSUFFICIENT_DATA
+Raw:
+```json
+"❔ **acmecorp-us-east_server-cpu-too-high** ❔\nThe `acmecorp-us-east_server-cpu-too-high` alarm is ambiguous! This alarm triggers when CPU utilization of the `acmecorp-us-east` server exceeds 50% for five minutes.\n\nReason:\n```\nUnchecked: Initial alarm creation\n```\nTimestamp:\n```\n2019-02-10 13:43:12.896 EDT\n```\nContact the bot maintainer if this does not resolve in ten minutes or so."
+```
+Rendered:
+> ❔ **acmecorp-us-east_server-cpu-too-high** ❔
+> The `acmecorp-us-east_server-cpu-too-high` alarm is ambiguous! This alarm triggers when CPU utilization of the `acmecorp-us-east` server exceeds 50% for five minutes.
+>
+> Reason:
+> ```
+> Unchecked: Initial alarm creation
+> ```
+> Timestamp:
+> ```
+> 2019-02-10 13:43:12.896 EDT
+> ```
+> Contact the bot maintainer if this does not resolve in ten minutes or so.
+
+#### OK
+Raw:
+```json
+"✅ **acmecorp-us-east_server-cpu-too-high** ✅\nThe `acmecorp-us-east_server-cpu-too-high` alarm is resolved! This alarm triggers when CPU utilization of the `acmecorp-us-east` server exceeds 50% for five minutes.\n\nReason:\n```\nThreshold Crossed: 1 out of the last 1 datapoints [01.60229693434] was lower than or equal to the threshold (50.0) (minimum 1 datapoint for ALARM -> OK transition).\n```\nTimestamp:\n```\n2019-02-10 17:04:00.421 EDT\n```\nYaaaaay! 🎉"
+```
+Rendered:
+> ✅ **acmecorp-us-east_server-cpu-too-high** ✅
+> The `acmecorp-us-east_server-cpu-too-high` alarm is resolved! This alarm triggers when CPU utilization of the `acmecorp-us-east` server exceeds 50% for five minutes.
+>
+> Reason:
+> ```
+> Threshold Crossed: 1 out of the last 1 datapoints [01.60229693434] was lower than or equal to the threshold (50.0) (minimum 1 datapoint for ALARM -> OK transition).
+> ```
+> Timestamp:
+> ```
+> 2019-02-10 17:04:00.421 EDT
+> ```
+> Yaaaaay! 🎉
 
 ---
 > **_Legal Notice_**  
